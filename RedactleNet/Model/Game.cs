@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 namespace RedactleNet.Model
@@ -18,15 +19,60 @@ namespace RedactleNet.Model
         /// Dictonary representing the guessed words. Key is the word, value is the number of hits.
         /// </summary>
         public Dictionary<List<string>, int> GuessedWords { get { return _guessedWords; } }
+        
 
         public Game()
         {
             _wp = new("https://en.wikipedia.org/wiki/United_States");
             _nameOfArticle = _wp.GetArticleName();
             _article = _wp.GetArticleContent();
+            #region replacements
             _article = _article.Replace("(listen);", "");
+            _article = _article.Replace("%", " percent");
+            _article = _article.Replace("$", "");
+            #endregion
+            _encryptedArticle = EncryptArticle(_article);
         }
 
-        //private 
+        private string EncryptArticle(string article)
+        {
+            string encryptedArticle = string.Empty;
+
+            string word = string.Empty;
+            foreach(char c in article)
+            {
+                if ((Char.IsLetter(c) || Char.IsDigit(c)) == false) 
+                {
+                    word = string.Empty;
+                    encryptedArticle += c;
+                }
+                else
+                {
+                    encryptedArticle += "█";
+                }
+            }
+
+            return encryptedArticle;
+        }
+
+        //private void ReplaceDollarSign(ref string article)
+        //{
+        //    bool flag = true;
+        //    string number = string.Empty, word = string.Empty;
+        //    foreach(char c in article)
+        //    {
+        //        if (c != '$' && flag)
+        //            continue;
+
+        //        flag = false;
+        //        if (Char.IsLetter(c))
+        //            word += c;
+        //        if (Char.IsNumber(c))
+        //            number += c;
+
+        //        if (word == "bilion" || word == "milion" || word == "trilion")
+
+        //    }
+        //}
     }
 }
