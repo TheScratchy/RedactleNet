@@ -54,7 +54,7 @@ namespace RedactleNet.Model
                     if (tempArtCont == null)
                         break;
 
-                    if (tempArtCont.StartsWith("<p>") == false)
+                    if ((tempArtCont.Contains("<p>") || tempArtCont.Contains("<h3"))== false)
                         continue;
 
                     bool isHTMLStyleMarked = false;
@@ -118,7 +118,7 @@ namespace RedactleNet.Model
 
                         artContent += c;
                     }
-                    artContent += "\n";
+                    artContent += "\n\n";
                 } while (tempArtCont != null);
             }
             return artContent;

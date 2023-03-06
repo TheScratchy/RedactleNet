@@ -43,14 +43,12 @@ namespace RedactleNet.Model
             _wp = new("https://en.wikipedia.org/wiki/United_States");
             _nameOfArticle = _wp.GetArticleName();
             _article = _wp.GetArticleContent();
-            _article = "first " + _article;
-
             #region replacements
             _article = _article.Replace("(listen);", "");
             _article = _article.Replace("%", " percent");
             _article = _article.Replace("$", "");
             #endregion
-
+            _article = _nameOfArticle + "\n\n" + _article;
             _encryptedArticle = EncryptArticle(_article);
         }
 
@@ -64,22 +62,26 @@ namespace RedactleNet.Model
             string encryptedArticle = string.Empty;
 
             string word = string.Empty;
-            foreach(char c in article)
+            foreach (char c in article)
             {
-                if ((Char.IsLetter(c) || Char.IsDigit(c)) == false) 
-                {
-                    if (_startingWords.Contains(word.ToLower()))
-                        encryptedArticle += word;
-                    else
-                        foreach (char c2 in word)
-                            encryptedArticle += "█";
-                    word = string.Empty;
-                    encryptedArticle += c;
-                }
-                else
+                if (Char.IsLetter(c) || Char.IsDigit(c))
                 {
                     word += c;
+                    continue;
                 }
+
+                if (word == "A")
+                {
+                    encryptedArticle += "█";
+                }
+                else if (_startingWords.Contains(word.ToLower()))
+                    encryptedArticle += word;
+                else
+                    foreach (char c2 in word)
+                        encryptedArticle += "█";
+                word = string.Empty;
+                encryptedArticle += c;
+
             }
 
             return encryptedArticle;
@@ -102,20 +104,19 @@ namespace RedactleNet.Model
 
             foreach (char c in _article)
             {
-                if ((Char.IsLetter(c) || Char.IsDigit(c)) == false)
-                {
-                    if (guessedWord.Equals(word.ToLower()))
-                    {
-                        _encryptedArticle = _encryptedArticle.Remove(indexToReplace - word.Length, word.Length).Insert(indexToReplace - word.Length, word);
-                        guessedTimes++;
-                    }
-                    word = string.Empty;
-                }
-                else
+                indexToReplace++;
+                if (Char.IsLetter(c) || Char.IsDigit(c))
                 {
                     word += c;
+                    continue;
                 }
-                indexToReplace++;
+                if (guessedWord.Equals(word.ToLower()))
+                {
+                    _encryptedArticle = _encryptedArticle.Remove(indexToReplace - 1 - word.Length, word.Length).Insert(indexToReplace - 1 - word.Length, word);
+                    guessedTimes++;
+                }
+                word = string.Empty;
+                
             }
             _guessedWords[guessedWord] = guessedTimes;
         }
